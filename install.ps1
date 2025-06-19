@@ -16,11 +16,13 @@ if (-not ($distros -contains 'Ubuntu')) {
         wsl --install -d Ubuntu
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Ubuntuのインストールに失敗しました。"
+            Write-Host ""
             exit 1
         }
     }
     catch {
         Write-Error "Ubuntuのインストール中にエラーが発生しました。"
+        Write-Host ""
         exit 1
     }
 }
@@ -32,6 +34,19 @@ if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
     Write-Warning "Windows上にGitがインストールされていません。"
     Write-Host "インストールしてから再度このスクリプトを実行してください。" -ForegroundColor Cyan
     Read-Host "[Enter]でGitのダウンロードページを表示します。"
+    Write-Host ""
     Start-Process "https://git-scm.com/downloads"
+    exit 1
+}
+
+# Gitの設定
+$setupGitScript = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Path) -ChildPath "setup_git.ps1"
+if (Test-Path $setupGitScript) {  
+    & $setupGitScript
+    if ($LASTEXITCODE -ne 0) {
+        exit 1
+    }
+} else {
+    Write-Error "setup_git.ps1 が見つかりません。"
     exit 1
 }
