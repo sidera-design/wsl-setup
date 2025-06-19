@@ -55,5 +55,6 @@ Write-Host " Gitメールアドレス: $gitUserEmail"
 wsl git config --global user.email $gitUserEmail
 # Git Credential Managerの設定
 $GcmPathWSL = wsl wslpath -u "$GitCredentialManagerPath"
-$GcmPathWSL = $GcmPathWSL.Trim() # 改行除去
+$GcmPathWSL = $GcmPathWSL.Trim()
+$GcmPathWSL = $GcmPathWSL -replace ' ', '\ '
 wsl git config --global credential.helper "$GcmPathWSL"
