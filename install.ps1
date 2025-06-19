@@ -8,11 +8,11 @@ if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
 $distros = wsl --list --quiet 2>$null
 
 if (-not ($distros -contains 'Ubuntu')) {
-    Write-Host "Ubuntuがインストールされていません。"
+    Write-Host "Ubuntuがインストールされていません。" 
     try {
-        Write-Host "Ubuntuのインストールを完了しました。"
-        Write-Host "インストール後にユーザー名とパスワードを設定してください。"
-        Write-Host "その後WSLに処理が移るので exit で終了してから、再度実行してください。"
+        Write-Host "Ubuntuをインストールします。" -ForegroundColor Green
+        Write-Host "インストール後にユーザー名とパスワードを設定してください。" -ForegroundColor Cyan
+        Write-Host "その後WSLに処理が移るので exit で終了してから、再度このスクリプトを実行してください。" -ForegroundColor Cyan
         wsl --install -d Ubuntu
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Ubuntuのインストールに失敗しました。"
@@ -29,7 +29,8 @@ else {
 }
 
 if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
-    Write-Warning "Windows上にGitがインストールされていません。インストールしてから再度実行してください。"
+    Write-Warning "Windows上にGitがインストールされていません。"
+    Write-Host "インストールしてから再度このスクリプトを実行してください。" -ForegroundColor Cyan
     Read-Host "[Enter]でGitのダウンロードページを表示します。"
     Start-Process "https://git-scm.com/downloads"
     exit 1

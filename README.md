@@ -11,5 +11,6 @@ Windowsの設定で署名なしスクリプトの実行を許可しておく。
 
 ### Script List
 
-- setup.ps1 : WindowsのOS設定をWSL2がインストール可能にする
-- install.ps1 : WSLをインストールして開発環境を設定する
+- setup_win.ps1 : WindowsのOS環境をWSL2インストール可能な設定にする
+- install.ps1 : WSLにUbuntuをインストールして開発環境を設定する
+- uninstall.ps1 : WSLからUbuntuを取り除く
