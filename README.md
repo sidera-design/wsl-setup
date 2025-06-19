@@ -13,4 +13,7 @@ Windowsの設定で署名なしスクリプトの実行を許可しておく。
 
 - setup_win.ps1 : WindowsのOS環境をWSL2インストール可能な設定にする
 - install.ps1 : WSLにUbuntuをインストールして開発環境を設定する
+  （内部で以下のファイルを呼び出して実行）
+  - setup_git.ps1 : Gitを設定する
+  - setup.sh : WSL上の設定シェルスクリプト
 - uninstall.ps1 : WSLからUbuntuを取り除く
