@@ -1,4 +1,7 @@
-﻿# 定数の設定
+﻿Write-Host ""
+Write-Host "Gitの設定を行います。" -ForegroundColor Green
+
+# 定数の設定
 $GitCredentialManagerPath = "C:\Program Files\Git\mingw64\bin\git-credential-manager.exe"
 
 # GitがWindowsにインストールされているか確認
