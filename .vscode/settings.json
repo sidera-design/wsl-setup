@@ -1,5 +1,8 @@
 {
     "[powershell]": {
         "files.encoding": "utf8bom"
-    }
+    },
+    "[shellscript]": {
+        "files.eol": "\n"
+    }   
 }
