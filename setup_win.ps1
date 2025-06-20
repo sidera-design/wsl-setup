@@ -29,8 +29,8 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
 
     Write-Warning "管理者権限が必要な操作です。"
-    Write-Host "UACダイアログが表示された場合『はい』をクリックすると管理者として実行します。"
-    Read-Host "続行するには Enter キーを押してください。" -ForegroundColor Cyan
+    Write-Host "UACダイアログが表示された場合『はい』をクリックすると管理者として実行します。" -ForegroundColor Cyan
+    Read-Host "続行するには Enter キーを押してください。"
     
     # 管理者として再実行（UACダイアログが表示される）
     Start-Process powershell `
@@ -88,10 +88,10 @@ else {
 }
 
 Write-Host ""  
-Read-Host "Windowsの環境設定が完了しました。" -ForegroundColor Green
+Write-Host "Windowsの環境設定が完了しました。" -ForegroundColor Green
 
 # 再起動確認
-$answer = Read-Host "PCを再起動しますか？ (Y/N)" --ForegroundColor Cyan
+$answer = Read-Host "PCを再起動しますか？ (Y/N)"
 if ($answer -match '^[Yy]$') {
   Restart-Computer -Force
 } else {
