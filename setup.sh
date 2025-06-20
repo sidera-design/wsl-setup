@@ -4,11 +4,25 @@
 set -euo pipefail
 # set -euxo pipefail    # for debugging
 
+echo
 echo -e "\e[36maptのパッケージリストを更新します。\e[0m"
-echo -e "root権限が必要になるため、WSLのパスワードを入力してください。"
+echo "root権限が必要になるため、WSLのパスワードを入力してください。"
 sudo apt-get update
 
 # Python setup
 # カラー出力の例
+echo
 echo -e "\e[36mPython3をデフォルトに設定します。\e[0m"
 sudo apt install -y python-is-python3
+echo
+python --version
+
+# podman setup
+echo
+echo -e "\e[36mpodmanをインストールします。\e[0m"
+sudo apt install -y \
+    podman \
+    podman-docker
+echo
+podman --version
+podman info > /dev/null
