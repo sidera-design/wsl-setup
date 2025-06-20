@@ -28,8 +28,9 @@ try {
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()
     ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
 
-    Write-Host "管理者権限が必要な操作です。UACダイアログで『はい』をクリックすると管理者として実行します。"
-    Read-Host "続行するには Enter キーを押してください。"
+    Write-Warning "管理者権限が必要な操作です。"
+    Write-Host "UACダイアログが表示された場合『はい』をクリックすると管理者として実行します。"
+    Read-Host "続行するには Enter キーを押してください。" -ForegroundColor Cyan
     
     # 管理者として再実行（UACダイアログが表示される）
     Start-Process powershell `
@@ -37,13 +38,6 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
         -Verb RunAs
     exit
 }
-# If (-not ([Security.Principal.WindowsPrincipal] `
-#     [Security.Principal.WindowsIdentity]::GetCurrent()
-#   ).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-#   Write-Warning "管理者として実行してください。スクリプトを右クリック → 『管理者として実行』 を選択。"
-#   Pause
-#   Exit 1
-# }
 
 # OSバージョン・ビルド取得
 $os = Get-CimInstance Win32_OperatingSystem
@@ -52,7 +46,7 @@ $parts = $version.Split('.')
 [int]$major = $parts[0]; [int]$minor = $parts[1]; [int]$build = $parts[2]
 
 function Show-Incompatible {
-  Write-Host "この PC では WSL2 の要件を満たしていません。" -ForegroundColor Red
+  Write-Error "この PC では WSL2 の要件を満たしていません。"
   Write-Host "  ・Windows 10 ビルド 18362 以上が必要です。" 
   Write-Host "  ・BIOS/UEFI で仮想化 (VT-x/AMD-V) を有効にしてください。" 
   Pause
@@ -60,13 +54,15 @@ function Show-Incompatible {
 }
 
 function Enable-WSLFeatures {
+  Write-Host ""  
   Write-Host "WSL と仮想マシンプラットフォーム機能を有効化しています..."
   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart | Out-Null
   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart   | Out-Null
 }
 
-Write-Host "`n== WSL2 インストール準備スクリプト ==" -ForegroundColor Cyan
-Write-Host "検出された OS バージョン: $version" -ForegroundColor Green
+Write-Host ""  
+Write-Host "WSL2 のインストール環境を設定します。" -ForegroundColor Green
+Write-Host "検出された OS バージョン: $version"
 
 # ビルド番号チェック
 if ($major -eq 10 -and $build -lt 18362) {
@@ -77,8 +73,9 @@ if ($major -eq 10 -and $build -lt 18362) {
 Enable-WSLFeatures
 
 # 手順案内
-Write-Host "`n-- 再起動後の手順案内 --`n" -ForegroundColor Cyan
+Write-Host ""  
 if ($major -eq 10 -and $build -lt 19041) {
+  Write-Host "再起動後に以下の手順でインストールしてください。" -ForegroundColor Cyan
   # Windows10 19041 未満：手動手順
   Write-Host "1. https://aka.ms/wsl2kernel から WSL2 カーネル更新プログラムをダウンロード／インストール"  
   Write-Host "2. Microsoft Store で Ubuntu などの Linux ディストリビューションをインストール"
@@ -86,13 +83,18 @@ if ($major -eq 10 -and $build -lt 19041) {
 }
 else {
   # Windows10 19041 以上 または Windows11
-  Write-Host "再起動後に次のコマンドで自動インストールが可能です：" -ForegroundColor Green
-  Write-Host "`t wsl --install"
+  Write-Host "再起動後に次のコマンドで自動インストールが可能です：" -ForegroundColor Cyan
+  Write-Host "  wsl --install"
 }
 
 Write-Host ""  
-Read-Host "準備が完了しました。再起動して続行するには Enter キーを押してください"
+Read-Host "Windowsの環境設定が完了しました。" -ForegroundColor Green
 
-# 再起動
-Write-Host "システムを再起動しています..." -ForegroundColor Yellow
-Restart-Computer -Force
+# 再起動確認
+$answer = Read-Host "PCを再起動しますか？ (Y/N)" --ForegroundColor Cyan
+if ($answer -match '^[Yy]$') {
+  Restart-Computer -Force
+} else {
+  Write-Host "再起動をキャンセルしました。手動で再起動してください。"
+  Write-Host ""  
+}
