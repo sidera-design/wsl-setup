@@ -1,40 +1,48 @@
 ﻿# 定数設定
 $GitSetupFileName = "setup_git.ps1"
 $WslSetupFileName = "setup.sh"
+$DefaultDistroName = "Ubuntu-Sample"
 
+if ($args.Count -gt 0) {
+    $WslDistroName = $args[0]
+} else {
+    $WslDistroName = $DefaultDistroName
+}
 
 # WSLの設定を確認
 if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
-    Write-Warning "WSLがインストールされていません。WSLを有効にしてから再度実行してください。"
+    Write-Warning "WSL機能がインストールされていません。WSLを有効にしてから再度実行してください。"
     exit 1
 }
 
 # WSLでインストール済みディストリビューションを取得
 $distros = wsl --list --quiet 2>$null
 
-if (-not ($distros -contains 'Ubuntu')) {
-    Write-Host "Ubuntuがインストールされていません。" 
+if (-not ($distros -contains "$WslDistroName") ){
+    Write-Host "WSLに '$WslDistroName' がインストールされていません。" 
     try {
-        Write-Host "Ubuntuをインストールします。" -ForegroundColor Green
+        Write-Host "Ubuntu ($WslDistroName) をインストールします。" -ForegroundColor Green
+        Write-Host "------------------------ 操作手順 --------------------------------" -ForegroundColor Cyan
         Write-Host "インストール後にWSLのユーザー名とパスワードを設定してください。" -ForegroundColor Cyan
         Write-Host "その後WSLのシェル(bash)が起動するので exit コマンドで終了してください。" -ForegroundColor Cyan
-        wsl --install -d Ubuntu
+        Write-Host "------------------------------------------------------------------" -ForegroundColor Cyan
+        wsl --install -d Ubuntu --name $WslDistroName
         if ($LASTEXITCODE -ne 0) {
-            Write-Error "Ubuntuのインストールに失敗しました。"
+            Write-Error "Ubuntu ($WslDistroName) のインストールに失敗しました。"
             Write-Host ""
             exit 1
         }
-        Write-Host "Ubuntuのインストールが完了しました。"
+        Write-Host "Ubuntu ($WslDistroName) のインストールが完了しました。"
         Write-Host ""
     }
     catch {
-        Write-Error "Ubuntuのインストール中にエラーが発生しました。"
+        Write-Error "Ubuntu ($WslDistroName) のインストール中にエラーが発生しました。"
         Write-Host ""
         exit 1
     }
 }
 else {
-    Write-Host "Ubuntuは既にインストールされています。"
+    Write-Host "WSL に '$WslDistroName' が存在します。"
 }
 
 # Gitの設定
@@ -53,17 +61,17 @@ if (Test-Path $setupGitScript) {
 # $WslSetupFileName を WSL の /tmp ディレクトリにコピーして実行
 $setupShPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Path) -ChildPath "$WslSetupFileName"
 if (Test-Path $setupShPath) {
-    $setupShWslPath = wsl -- wslpath -u "'$setupShPath'"
+    $setupShWslPath = wsl -d $WslDistroName -- wslpath -u "'$setupShPath'"
     if ($LASTEXITCODE -ne 0) {
         Write-Error "$WslSetupFileName のパス変換に失敗しました。"
         exit 1
     }
     # /tmp ディレクトリにコピー
-    wsl cp "$setupShWslPath" /tmp/$WslSetupFileName
+    wsl -d $WslDistroName cp "$setupShWslPath" /tmp/$WslSetupFileName
     # $WslSetupFileName 実行
     Write-Host ""
     Write-Host "WSL上で設定スクリプト($WslSetupFileName)を実行します。" -ForegroundColor Green
-    wsl bash /tmp/$WslSetupFileName
+    wsl -d $WslDistroName bash /tmp/$WslSetupFileName
     if ($LASTEXITCODE -ne 0) {
         Write-Error "$WslSetupFileName の実行に失敗しました。"
         exit 1
