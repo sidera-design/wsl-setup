@@ -36,8 +36,10 @@ unset HISTFILE  # 履歴ファイル無効化（念のため）
 # PROXY情報
 source ~/.profile 2>/dev/null || true
 
-if [[ -n "${PROXY_USER:-}" && "${HTTP_PROXY:-}" == *"${PROXY_USER}"* ]]; then
-    echo "既にPROXY_USERが設定されているため、Proxy設定をスキップします。"
+# インターネット接続確認
+curl -I https://www.google.com
+if [[ $? -eq 0 ]]; then
+    echo "インターネット接続は既に有効です。Proxy設定をスキップします。"
 else
     PROXY_HOST="172.16.44.6"     # PROXYサーバアドレス
     PROXY_PORT="8080"
