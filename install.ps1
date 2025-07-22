@@ -62,18 +62,29 @@ if (Test-Path $setupGitScript) {
 $setupShPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Path) -ChildPath "$WslSetupFileName"
 if (Test-Path $setupShPath) {
     $setupShWslPath = wsl -d $WslDistroName -- wslpath -u "'$setupShPath'"
+    $setupShHomePath = "/tmp/$WslSetupFileName"
     if ($LASTEXITCODE -ne 0) {
         Write-Error "$WslSetupFileName のパス変換に失敗しました。"
         exit 1
     }
     # /tmp ディレクトリにコピー
-    wsl -d $WslDistroName cp "$setupShWslPath" /tmp/$WslSetupFileName
+    wsl -d $WslDistroName -- cp "$setupShWslPath" "$setupShHomePath"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "$setupShWslPath から $setupShHomePath へのコピーに失敗しました。"
+        exit 1
+    }
+    # 改行コードをLinux形式に変換
+    wsl -d $WslDistroName -- sed -i "'s/\r$//'" "$setupShHomePath"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "$setupShHomePath の改行コードの変換失敗しました。"
+        exit 1
+    }
     # $WslSetupFileName 実行
     Write-Host ""
     Write-Host "WSL上で設定スクリプト($WslSetupFileName)を実行します。" -ForegroundColor Green
-    wsl -d $WslDistroName bash /tmp/$WslSetupFileName
+    wsl -d $WslDistroName -- bash "$setupShHomePath"
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "$WslSetupFileName の実行に失敗しました。"
+        Write-Error "$setupShHomePath の実行に失敗しました。"
         exit 1
     }
 } else {
