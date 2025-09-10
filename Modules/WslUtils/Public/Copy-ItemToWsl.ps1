@@ -8,6 +8,8 @@
 
   # ディストロ名を解決
   $DistroName = Resolve-WslDistro $Distro 
+  # WSLのパス名を解決（~や環境変数の展開）
+  $wslDestination = wsl -d $DistroName -- bash -lc "echo $Destination"
 
   if (-not (Test-Path $Source)) {
     throw "コピー元 '$Source' が見つかりません。"
@@ -20,9 +22,10 @@
     # 存在しなければ作成
     if (-not (Test-Path $parentDir)) {
       $wslParentPath = Convert-PathToWsl $parentDir -Distro $DistroName
-      wsl.exe -d $DistroName -- bash -lc "mkdir -p '$wslParentPath'"
+      wsl.exe -d $DistroName -- bash -lc "mkdir -p $wslParentPath"
     }
     $wslSourcePath = Convert-PathToWsl $resolved -Distro $DistroName
-    wsl.exe -d $DistroName -- cp -rf $wslSourcePath $Destination
+    wsl.exe -d $DistroName -- bash -lc "cp -rf $wslSourcePath $wslDestination"
   }
+  Write-Host "Copied to WSL ${DistroName}:${Destination} from $Source"
 }

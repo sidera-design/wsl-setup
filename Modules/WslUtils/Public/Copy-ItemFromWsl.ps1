@@ -8,6 +8,9 @@
 
   # ディストロ名を解決
   $DistroName = Resolve-WslDistro $Distro   
+  # WSLのパス名を解決（~や環境変数の展開）
+  $wslSource = wsl -d $DistroName -- bash -lc "echo $Source"
+
 
   if ($PSCmdlet.ShouldProcess("${DistroName}:${Source}", "Copy to $Destination")) {
     # 親フォルダを取得
@@ -17,7 +20,7 @@
       New-Item -Path $parentDir -ItemType Directory -Force | Out-Null
     }
     $wslDestPath = Convert-PathToWsl $Destination -Distro $DistroName
-    wsl.exe -d $DistroName -- cp -rf $Source $wslDestPath
+    wsl.exe -d $DistroName -- cp -rf $wslSource $wslDestPath
   }
-  Write-Host "Copied by WSL to $Destination"
+  Write-Host "Copied to $Destination from WSL ${DistroName}:${Source}"
 }
