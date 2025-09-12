@@ -12,6 +12,13 @@
   $DistroName = Resolve-WslDistro $Distro 
   # WSLのパス名を解決（~や環境変数の展開）
   $wslDestination = wsl -d $DistroName -- bash -lc "echo $Destination"
+  # コピー先親フォルダを取得
+  if ($wslDestination.EndsWith("/")) {
+    $parentDir = $wslDestination.TrimEnd("/")
+  }
+  else {
+    $parentDir = wsl.exe -d $DistroName -- bash -lc "dirname '$wslDestination'"
+  }
 
   if (-not (Test-Path $Source)) {
     throw "コピー元 '$Source' が見つかりません。"
@@ -32,15 +39,7 @@
   }
 
   if ($PSCmdlet.ShouldProcess("${Source}", "Copy to ${DistroName}:${Destination}")) {
-    # 親フォルダを取得
-    if ($wslDestination.EndsWith("/")) {
-      $parentDir = $wslDestination.TrimEnd("/")
-    }
-    else {
-      $parentDir = Split-Path -Parent $wslDestination
-    }
-    $parentDir = wsl.exe -d $DistroName -- bash -lc "dirname '$wslDestination'"
-    # 存在しなければ作成
+    # 親フォルダが存在しなければ作成
     wsl.exe -d $DistroName -- bash -lc "test -d '$parentDir' || mkdir -p '$parentDir'"
     # コピー
     wsl.exe -d $DistroName -- bash -lc "cp -rf $wslSourcePath $wslDestination"
