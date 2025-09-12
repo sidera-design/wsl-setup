@@ -21,7 +21,8 @@
   $destIsDir = wsl -d $DistroName -- bash -lc "test -d '$resolvedPath'"
   if ($destIsDir -or $resolvedPath.EndsWith("/")) {
     $wslDir = $resolvedPath.TrimEnd("/")
-  } else {
+  }
+  else {
     $wslDir = Split-Path -Parent $resolvedPath
   }
   $WslPath = "$wslDir/$scriptName"
@@ -37,19 +38,7 @@
     }
   }
   # スクリプトをWSLにコピー
-    Copy-ItemToWsl -Source $Script -Destination $WslPath -Distro $DistroName
-    
-  # 改行コードをLinux形式に変換
-  wsl -d $DistroName -- bash -lc "sed -i 's/\r$//' '$WslPath'"
-  if ($LASTEXITCODE -ne 0) {
-    throw "$WslPath の改行コードの変換失敗しました。"
-  }
-
-  # 実行権限の設定
-  wsl -d $DistroName -- chmod +x "'$WslPath'"
-  if ($LASTEXITCODE -ne 0) {
-    throw "WSL内のスクリプト '$WslPath' の実行権限の設定に失敗しました。"
-  }
+  Copy-ItemToWsl -Source $Script -Destination $WslPath -Distro $DistroName -ConvertLF -SetExecutable
 
   # スクリプト実行
   Write-Host "Executing WSL script: ${DistroName}:${WslPath} $ScriptArgs"
@@ -57,7 +46,8 @@
   if ($UseSudo) {
     # sudo で実行する場合、パスワード入力を求められる
     wsl -d $DistroName -- sudo bash -lc "$WslPath $ScriptArgs"
-  } else {
+  }
+  else {
     wsl -d $DistroName -- bash -lc "$WslPath $ScriptArgs"
   }
   if ($LASTEXITCODE -ne 0) {
