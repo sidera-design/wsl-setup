@@ -25,8 +25,7 @@
   }
 
   # コピー元ファイルの確認
-  $resolved = [System.IO.Path]::GetFullPath($Source)
-  $wslSourcePath = Convert-PathToWsl $resolved -Distro $DistroName
+  $wslSourcePath = Convert-PathToWsl $Source -Distro $DistroName
   $isFileSource = wsl.exe -d $DistroName -- bash -lc "test -f '$wslSourcePath' && echo 'True'"
 
   if ($ConvertLF -and ($isFileSource -ne "True")) {
