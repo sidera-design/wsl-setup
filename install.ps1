@@ -1,4 +1,4 @@
-﻿Import-Module '.\Modules\WslUtils\WslUtils.psd1' -Force *> $null
+﻿Import-Module '.\Modules\WslUtils\WslUtils.psd1' -Force
 
 # 定数設定
 $WslSetupFileName = "setup.sh"
@@ -48,7 +48,7 @@ else {
 }
 
 # Gitの設定
-Setup-WslGit -Distro $WslDistroName
+Install-WslGit -Distro $WslDistroName
 
 # $WslSetupFileName を WSL の /tmp ディレクトリにコピーして実行
 $setupShPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Path) -ChildPath "$WslSetupFileName"

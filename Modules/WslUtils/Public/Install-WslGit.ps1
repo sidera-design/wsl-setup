@@ -1,4 +1,4 @@
-﻿function Setup-WslGit {
+﻿function Install-WslGit {
   param(
     [string]$Distro = $null
   )
