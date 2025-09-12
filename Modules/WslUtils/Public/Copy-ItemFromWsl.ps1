@@ -21,6 +21,7 @@
     }
     $wslDestPath = Convert-PathToWsl $Destination -Distro $DistroName
     wsl.exe -d $DistroName -- cp -rf $wslSource $wslDestPath
+
+    Write-Host "Copied to $Destination from WSL ${DistroName}:${wslSource}"
   }
-  Write-Host "Copied to $Destination from WSL ${DistroName}:${Source}"
 }

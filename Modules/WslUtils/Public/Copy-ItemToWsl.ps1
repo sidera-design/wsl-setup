@@ -33,15 +33,20 @@
 
   if ($PSCmdlet.ShouldProcess("${Source}", "Copy to ${DistroName}:${Destination}")) {
     # 親フォルダを取得
-    $parentDir = Split-Path -Parent $resolved
-    # 存在しなければ作成
-    if (-not (Test-Path $parentDir)) {
-      $wslParentPath = Convert-PathToWsl $parentDir -Distro $DistroName
-      wsl.exe -d $DistroName -- bash -lc "mkdir -p $wslParentPath"
+    if ($wslDestination.EndsWith("/")) {
+      $parentDir = $wslDestination.TrimEnd("/")
     }
+    else {
+      $parentDir = Split-Path -Parent $wslDestination
+    }
+    $parentDir = wsl.exe -d $DistroName -- bash -lc "dirname '$wslDestination'"
+    # 存在しなければ作成
+    wsl.exe -d $DistroName -- bash -lc "test -d '$parentDir' || mkdir -p '$parentDir'"
+    # コピー
     wsl.exe -d $DistroName -- bash -lc "cp -rf $wslSourcePath $wslDestination"
 
     if ($isFileSource -eq "True") {
+      # コピー先のファイル名を取得
       $wslFileName = wsl.exe -d $DistroName -- bash -lc "test -d '$wslDestination' && echo '$($wslDestination.TrimEnd("/"))/$(Split-Path -Leaf $wslSourcePath)' || echo '$wslDestination'"
 
       if ($ConvertLF) {
@@ -61,6 +66,6 @@
       }
     }
 
+    Write-Host "Copied to WSL ${DistroName}:${wslDestination} from $Source ($wslSourcePath)"
   }
-  Write-Host "Copied to WSL ${DistroName}:${Destination} from $Source"
 }
