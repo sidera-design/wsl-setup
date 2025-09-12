@@ -52,6 +52,6 @@
   }
   if ($LASTEXITCODE -ne 0) {
     Write-Host ""
-    Write-Warning "WSL内のスクリプト '$WslPath' の実行に失敗しました。Return code: $LASTEXITCODE" --ForegroundColor Yellow
+    Write-Warning "WSL内のスクリプト '$WslPath' の実行に失敗しました。Return code: $LASTEXITCODE"
   }
 }
