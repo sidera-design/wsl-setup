@@ -32,6 +32,7 @@ if (-not (Test-WslDistroExists $WslDistroName) ) {
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Ubuntu ($WslDistroName) のインストールに失敗しました。"
             Write-Host ""
+            Write-Host "ログオンに失敗する場合は、PCを再起動してから再度実行してください。" -ForegroundColor Yellow
             exit 1
         }
         Write-Host "Ubuntu ($WslDistroName) のインストールが完了しました。"
@@ -50,10 +51,19 @@ else {
 # Gitの設定
 Install-WslGit -Distro $WslDistroName
 
+Write-Host ""
+Write-Host "必要ファイルをWSLにコピーしてWSL上で設定スクリプトを実行します。" -ForegroundColor Green
+
 # $WslSetupFileName を WSL の /tmp ディレクトリにコピーして実行
 $setupShPath = Join-Path -Path (Split-Path -Parent $MyInvocation.MyCommand.Path) -ChildPath "$WslSetupFileName"
-Invoke-WslScript $setupShPath -Distro $WslDistroName
-
+try {
+    Invoke-WslScript $setupShPath -Distro $WslDistroName
+}
+catch {
+    Write-Error "WSL内での設定スクリプトの実行に失敗しました。: $($_.Exception.Message)"
+    Write-Host ""
+    exit 1
+}
 
 # WSL設定の終了
 Write-Host ""
