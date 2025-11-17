@@ -11,7 +11,7 @@
     $DistroName = Resolve-WslDistro $Distro 
 
     $resolved = Resolve-Path $WindowsPath
-    $out = wsl.exe -d $DistroName -- wslpath -a "'$resolved'" 2>$null
+    $out = wsl.exe -d $DistroName -- bash -c "wslpath -a '$resolved'" 2>$null
     if (-not $LASTEXITCODE -eq 0 -or -not $out) {
       throw "wslpath 変換に失敗: $WindowsPath (WSLディストロ名: $DistroName)"
     }
