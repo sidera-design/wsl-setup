@@ -62,5 +62,7 @@
   wsl -d $DistroName -- bash -lc "git config --global user.email '$gitUserEmail'"
   # Git Credential Managerの設定
   $GcmPathWSL = Convert-PathToWsl $GitCredentialManagerPath -Distro $DistroName
-  wsl -d $DistroName -- bash -lc "git config --global credential.helper '$GcmPathWSL'"
+  wsl -d $DistroName -- bash -lc 'mkdir -p ~/bin'
+  wsl -d $DistroName -- bash -lc "ln -sf '$GcmPathWSL' ~/bin/git-credential-manager"
+  wsl -d $DistroName -- bash -lc 'git config --global credential.helper $HOME/bin/git-credential-manager'
 }
